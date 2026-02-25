@@ -21,20 +21,13 @@
     "noEmit": true,
     "esModuleInterop": true,
     "isolatedModules": true,
-    "skipLibCheck": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
+    "skipLibCheck": true
   },
   "include": [
     "next-env.d.ts",
     "cloudflare-env.d.ts",
     "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    "**/*.tsx"
   ],
   "exclude": [
     "node_modules"

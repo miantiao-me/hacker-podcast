@@ -9,9 +9,10 @@
 # testing
 /coverage
 
-# next.js
+# next.js / vinext
 /.next/
 /out/
+/dist/
 
 # production
 /build
@@ -35,7 +36,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# OpenNext
+# OpenNext (legacy)
 /.open-next
 
 # wrangler
@@ -44,3 +45,5 @@ next-env.d.ts
 # dev.vars
 .dev.vars
 .claude/
+
+.agents/

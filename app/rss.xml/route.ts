@@ -1,5 +1,5 @@
 import process from 'node:process'
-import { getCloudflareContext } from '@opennextjs/cloudflare'
+import { env } from 'cloudflare:workers'
 import markdownit from 'markdown-it'
 import { NextResponse } from 'next/server'
 import { Podcast } from 'podcast'
@@ -36,7 +36,6 @@ export async function GET() {
     webMaster: 'hacker-podcast@agi.li',
   })
 
-  const { env } = await getCloudflareContext({ async: true })
   const runEnv = env.NODE_ENV || 'production'
   const pastDays = getPastDays(10)
   const posts = (await Promise.all(

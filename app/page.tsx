@@ -1,5 +1,5 @@
 import type { PodcastInfo } from '@/types/podcast'
-import { getCloudflareContext } from '@opennextjs/cloudflare'
+import { env } from 'cloudflare:workers'
 import { Podcast } from '@/components/podcast'
 import { keepDays, podcast, site } from '@/config'
 import { buildEpisodesFromArticles } from '@/lib/episodes'
@@ -12,7 +12,6 @@ export default async function Home({
 }: {
   searchParams: Promise<{ page?: string }>
 }) {
-  const { env } = await getCloudflareContext({ async: true })
   const runEnv = env.NODE_ENV || 'production'
   const query = await searchParams
   const requestedPage = Number.parseInt(query.page ?? '1', 10)
