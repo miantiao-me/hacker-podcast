@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { getCloudflareContext } from '@opennextjs/cloudflare'
+import { env } from 'cloudflare:workers'
 import { notFound } from 'next/navigation'
 import { EpisodeDetail } from '@/components/episodes/detail'
 import { PodcastScaffold } from '@/components/podcast/scaffold'
@@ -13,7 +13,6 @@ export async function generateMetadata({
 }: {
   params: Promise<{ date: string }>
 }): Promise<Metadata> {
-  const { env } = await getCloudflareContext({ async: true })
   const runEnv = env.NODE_ENV || 'production'
   const { date } = await params
   const post = (await env.HACKER_PODCAST_KV.get(`content:${runEnv}:hacker-podcast:${date}`, 'json')) as unknown as Article | null
@@ -59,7 +58,6 @@ export default async function PostPage({
   params: Promise<{ date: string }>
   searchParams: Promise<{ page?: string }>
 }) {
-  const { env } = await getCloudflareContext({ async: true })
   const runEnv = env.NODE_ENV || 'production'
   const { date } = await params
   const pageQuery = await searchParams

@@ -31,8 +31,10 @@ const themeInitializer = `
   })()
 `
 
+// vinext's metadata shim expects a string (calls .startsWith()),
+// not a URL object like Next.js does
 const metadataBase = process.env.NEXT_PUBLIC_BASE_URL
-  ? new URL(process.env.NEXT_PUBLIC_BASE_URL)
+  ? (process.env.NEXT_PUBLIC_BASE_URL as unknown as URL)
   : undefined
 
 export const metadata: Metadata = {
@@ -44,12 +46,7 @@ export const metadata: Metadata = {
   description: site.seo.defaultDescription,
   alternates: {
     types: {
-      'application/rss+xml': [
-        {
-          url: '/rss.xml',
-          title: site.seo.defaultTitle,
-        },
-      ],
+      'application/rss+xml': '/rss.xml',
     },
   },
   openGraph: {

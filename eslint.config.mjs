@@ -4,7 +4,7 @@ import eslintPluginBetterTailwindcss from 'eslint-plugin-better-tailwindcss'
 export default antfu({
   formatters: true,
   react: true,
-  nextjs: true,
+
   pnpm: false,
   ignores: [
     'components/ui/**/*',

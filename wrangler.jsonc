@@ -5,16 +5,14 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "hacker-podcast",
-  "main": ".open-next/worker.js",
-  "minify": true,
+  "main": "vinext/server/app-router-entry",
   "upload_source_maps": true,
-  "compatibility_date": "2025-11-15",
+  "compatibility_date": "2026-02-12",
   "compatibility_flags": [
     "nodejs_compat"
   ],
   "assets": {
-    "binding": "ASSETS",
-    "directory": ".open-next/assets"
+    "not_found_handling": "none"
   },
   "observability": {
     "traces": {
@@ -38,38 +36,16 @@
     {
       "binding": "HACKER_PODCAST_R2",
       "bucket_name": "hacker-podcast"
-    },
-    {
-      "binding": "NEXT_INC_CACHE_R2_BUCKET",
-      "bucket_name": "hacker-podcast"
     }
   ],
-  "services": [
-    {
-      "binding": "WORKER_SELF_REFERENCE",
-      "service": "hacker-podcast"
-    }
-  ],
-  "durable_objects": {
-    "bindings": [
-      {
-        "name": "NEXT_CACHE_DO_QUEUE",
-        "class_name": "DOQueueHandler"
-      },
-      {
-        "name": "NEXT_TAG_CACHE_DO_SHARDED",
-        "class_name": "DOShardedTagCache"
-      },
-      {
-        "name": "NEXT_CACHE_DO_PURGE",
-        "class_name": "BucketCachePurge"
-      }
-    ]
-  },
   "migrations": [
     {
       "tag": "open-next",
       "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache", "BucketCachePurge"]
+    },
+    {
+      "tag": "vinext-remove-do",
+      "deleted_classes": ["DOQueueHandler", "DOShardedTagCache", "BucketCachePurge"]
     }
   ]
 }
