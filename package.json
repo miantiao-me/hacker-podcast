@@ -16,6 +16,8 @@
     "dev:worker": "wrangler dev --cwd worker --persist-to ../.wrangler/state",
     "deploy:worker": "wrangler deploy --cwd worker",
     "logs:worker": "wrangler tail --cwd worker",
+    "test": "vitest run",
+    "test:integration": "vitest run --testPathPattern=integration",
     "tests": "wrangler dev --cwd tests --remote",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
@@ -76,6 +78,7 @@
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
     "vite": "^7",
+    "vitest": "^3.2.4",
     "wrangler": "^4.68.1"
   },
   "simple-git-hooks": {

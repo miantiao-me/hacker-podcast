@@ -25,8 +25,8 @@
 
 - [vinext](https://github.com/cloudflare/vinext) (Vite + React Server Components) 应用框架
 - Cloudflare Workers 部署和运行环境
-- TTS 语音合成
-- OpenAI API 内容生成
+- 多 LLM 提供商支持（OpenAI、[MiniMax](https://www.minimax.io) 等 OpenAI 兼容 API）
+- TTS 语音合成（Edge TTS / MiniMax Cloud TTS / Murf.ai）
 - Tailwind CSS 样式处理
 - shadcn-ui 组件库
 
@@ -60,9 +60,16 @@ NEXT_STATIC_HOST=http://localhost:3000/static
 NODE_ENV=development
 HACKER_PODCAST_WORKER_URL=https://you-worker-url
 HACKER_PODCAST_R2_BUCKET_URL=https://your-bucket-url
+
+# 使用 OpenAI (默认)
 OPENAI_API_KEY=your_api_key
 OPENAI_BASE_URL=https://api.openai.com/v1
 OPENAI_MODEL=gpt-4.1
+
+# 或使用 MiniMax (设置 LLM_PROVIDER=minimax 即可自动配置 base URL 和默认模型)
+# LLM_PROVIDER=minimax
+# MINIMAX_API_KEY=your_minimax_api_key
+# OPENAI_MODEL=MiniMax-M2.7          # 可选，默认 MiniMax-M2.7
 
 ```
 
@@ -81,6 +88,18 @@ pnpm dev
 >
 > - 本地运行工作流时，Edge TTS 转换音频可能会卡住。建议直接注释该部分代码进行调试。
 > - 由于合并音频需要使用 Cloudflare 的浏览器端呈现，不支持本地开发，需要远程调试。可以使用 `pnpm tests` 进行测试。
+
+## LLM 提供商
+
+项目支持通过 `LLM_PROVIDER` 环境变量切换 LLM 提供商：
+
+| 提供商 | `LLM_PROVIDER` | 默认模型 | API Key 环境变量 |
+|--------|----------------|----------|-----------------|
+| OpenAI | `openai`（默认） | `gpt-4.1` | `OPENAI_API_KEY` |
+| [MiniMax](https://www.minimax.io) | `minimax` | `MiniMax-M2.7` | `MINIMAX_API_KEY` |
+| 其他 OpenAI 兼容 | 不设置 | 需指定 `OPENAI_MODEL` | `OPENAI_API_KEY` |
+
+设置 `LLM_PROVIDER=minimax` 后，base URL 和默认模型会自动配置，只需提供 `MINIMAX_API_KEY`。也可通过 `OPENAI_BASE_URL` 和 `OPENAI_MODEL` 手动覆盖。
 
 ## 部署
 

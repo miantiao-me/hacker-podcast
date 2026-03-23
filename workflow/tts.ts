@@ -24,7 +24,9 @@ async function edgeTTS(text: string, gender: string, env: Env) {
 }
 
 async function minimaxTTS(text: string, gender: string, env: Env) {
-  const result = await $fetch<{ data: { audio: string }, base_resp: { status_msg: string } }>(`${env.TTS_API_URL || 'https://api.minimaxi.com/v1/t2a_v2'}?GroupId=${env.TTS_API_ID}`, {
+  const apiURL = env.TTS_API_URL || 'https://api.minimax.io/v1/t2a_v2'
+  const url = env.TTS_API_ID ? `${apiURL}?GroupId=${env.TTS_API_ID}` : apiURL
+  const result = await $fetch<{ data: { audio: string }, base_resp: { status_msg: string } }>(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -32,7 +34,7 @@ async function minimaxTTS(text: string, gender: string, env: Env) {
     },
     timeout: 30000,
     body: JSON.stringify({
-      model: env.TTS_MODEL || 'speech-2.6-hd',
+      model: env.TTS_MODEL || 'speech-2.8-hd',
       text,
       timber_weights: [
         {
@@ -48,8 +50,6 @@ async function minimaxTTS(text: string, gender: string, env: Env) {
         latex_read: false,
       },
       audio_setting: {
-        sample_rate: 32000,
-        bitrate: 128000,
         format: 'mp3',
       },
       language_boost: 'Chinese',
