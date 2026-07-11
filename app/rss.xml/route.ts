@@ -88,7 +88,6 @@ export async function GET() {
   const response = new NextResponse(feed.buildXml(), {
     headers: {
       'Content-Type': 'application/xml',
-      'Cache-Control': `public, max-age=${revalidate}, s-maxage=${revalidate}`,
     },
   })
 
