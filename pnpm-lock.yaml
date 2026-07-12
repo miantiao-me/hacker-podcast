@@ -92,6 +92,9 @@ importers:
       eslint-plugin-react-refresh:
         specifier: ^0.5.2
         version: 0.5.2(eslint@10.4.1(jiti@2.7.0))
+      fscreen:
+        specifier: ^1.2.0
+        version: 1.2.0
       lint-staged:
         specifier: ^17.0.7
         version: 17.0.7
@@ -2524,6 +2527,9 @@ packages:
         optional: true
       react-dom:
         optional: true
+
+  fscreen@1.2.0:
+    resolution: {integrity: sha512-hlq4+BU0hlPmwsFjwGGzZ+OZ9N/wq9Ljg/sq3pX+2CD7hrJsX9tJgWWK/wiNTFM212CLHWhicOoqwXyZGGetJg==}
 
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
@@ -6341,6 +6347,8 @@ snapshots:
     optionalDependencies:
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
+
+  fscreen@1.2.0: {}
 
   fsevents@2.3.3:
     optional: true
