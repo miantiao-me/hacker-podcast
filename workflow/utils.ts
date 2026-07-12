@@ -60,7 +60,7 @@ async function getContentFromJina(url: string, format: 'html' | 'markdown', sele
   return content
 }
 
-async function getContentFromFirecrawl(url: string, format: 'html' | 'markdown', selector?: ContentSelector, FIRECRAWL_KEY?: string): Promise<string> {
+async function getContentFromFirecrawl(url: string, format: 'html' | 'markdown' | 'rawHtml', selector?: ContentSelector, FIRECRAWL_KEY?: string): Promise<string> {
   if (!FIRECRAWL_KEY) {
     return ''
   }
@@ -78,7 +78,8 @@ async function getContentFromFirecrawl(url: string, format: 'html' | 'markdown',
       body: {
         url,
         formats: [format],
-        onlyMainContent: true,
+        onlyMainContent: format !== 'rawHtml',
+        maxAge: format === 'rawHtml' ? 0 : undefined,
         includeTags: selector?.include ? [selector.include] : undefined,
         excludeTags: selector?.exclude ? [selector.exclude] : undefined,
       },
@@ -135,14 +136,14 @@ export async function getHackerNewsTopStories(today: string, { JINA_KEY, FIRECRA
   const url = `https://news.ycombinator.com/front?day=${today}`
 
   if (FIRECRAWL_KEY) {
-    const firecrawlHtml = await getContentFromFirecrawl(url, 'html', {}, FIRECRAWL_KEY)
+    const firecrawlHtml = await getContentFromFirecrawl(url, 'rawHtml', {}, FIRECRAWL_KEY)
     if (firecrawlHtml) {
       const firecrawlStories = parseHackerNewsStories(firecrawlHtml)
       if (firecrawlStories.length > 0) {
         return firecrawlStories
       }
 
-      console.error('getHackerNewsTopStories from Firecrawl parsed no stories')
+      console.warn('getHackerNewsTopStories from Firecrawl parsed no stories, falling back to Jina')
     }
   }
 
