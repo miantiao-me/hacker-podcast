@@ -29,7 +29,7 @@ export async function mimoTTS(text: string, gender: Gender, env: Env): Promise<B
       messages: [{ role: 'assistant', content: text }],
       audio: {
         format: 'mp3',
-        voice: gender === '男' ? (env.MAN_VOICE_ID || '苏打') : (env.WOMAN_VOICE_ID || '冰糖'),
+        voice: gender === '男' ? (env.MAN_VOICE_ID || '白桦') : (env.WOMAN_VOICE_ID || '冰糖'),
       },
     },
   })

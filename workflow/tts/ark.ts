@@ -44,7 +44,7 @@ export async function arkTTS(text: string, gender: Gender, env: Env): Promise<Bl
       req_params: {
         text,
         speaker: gender === '男'
-          ? (env.MAN_VOICE_ID || 'zh_female_xiaohe_uranus_bigtts')
+          ? (env.MAN_VOICE_ID || 'zh_male_wennuanahu_uranus_bigtts')
           : (env.WOMAN_VOICE_ID || 'zh_female_qingxinnvsheng_uranus_bigtts'),
         audio_params: {
           format: 'mp3',
