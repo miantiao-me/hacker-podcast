@@ -4,24 +4,22 @@ import type { Components } from 'react-markdown'
 
 import type { Episode } from '@/types/podcast'
 import { RiArrowLeftSLine, RiPauseFill, RiPlayFill } from '@remixicon/react'
-import { useSelector } from '@tanstack/react-store'
 import { useRouter } from 'next/navigation'
 import { useEffect, useId, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { ImageZoom } from '@/components/common/image-zoom'
+import { markdownExternalLinkComponents } from '@/components/common/markdown-external-link'
 import { Waveform } from '@/components/common/waveform'
 import { EpisodeFullscreenToggle } from '@/components/episodes/fullscreen-toggle'
 import { useEpisodeFullscreen } from '@/hooks/use-episode-fullscreen'
+import { useEpisodePlayback } from '@/hooks/use-episode-playback'
 import { formatZhCnUtcDate, toIsoDateString } from '@/lib/date'
 import { extractImagesFromMarkdown } from '@/lib/markdown'
 import { cn } from '@/lib/utils'
-import { completePageNavigation } from '@/stores/page-store'
-import { getPlayerStore, pause, play, setCurrentEpisode } from '@/stores/player-store'
 
 interface EpisodeDetailProps {
   episode: Episode
-  initialPage?: number
 }
 
 interface EpisodeBackButtonProps {
@@ -30,7 +28,7 @@ interface EpisodeBackButtonProps {
   className?: string
 }
 
-export function EpisodeDetail({ episode, initialPage }: EpisodeDetailProps) {
+export function EpisodeDetail({ episode }: EpisodeDetailProps) {
   const content = episode.content ?? episode.description ?? ''
 
   const images = useMemo(() => extractImagesFromMarkdown(content), [content])
@@ -39,29 +37,8 @@ export function EpisodeDetail({ episode, initialPage }: EpisodeDetailProps) {
     window.scrollTo({ top: 0 })
   }, [])
 
-  useEffect(() => {
-    if (typeof initialPage === 'number') {
-      completePageNavigation(initialPage)
-    }
-  }, [initialPage])
-
-  const externalLinkTitle = '在新标签页打开外部链接'
-
   const markdownComponents: Partial<Components> = {
-    a: ({ href, children }: { href?: string, children?: React.ReactNode }) => (
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`
-          font-medium text-theme-text underline transition-colors
-          hover:text-theme-text-hover
-        `}
-        title={externalLinkTitle}
-      >
-        {children}
-      </a>
-    ),
+    ...markdownExternalLinkComponents,
     img: ({ src, alt }) => {
       if (typeof src !== 'string')
         return null
@@ -92,24 +69,8 @@ function EpisodeDetailContent({ episode, markdownComponents }: EpisodeDetailCont
   const isoPublishedDate = toIsoDateString(episode.published)
   const publishedDateLabel = formatZhCnUtcDate(episode.published)
   const headlineId = useId()
-  const playerStore = getPlayerStore()
-  const currentEpisode = useSelector(playerStore, state => state.currentEpisode)
-  const isPlaying = useSelector(playerStore, state => state.isPlaying)
+  const { isPlaying, togglePlayback } = useEpisodePlayback(episode)
   const { isFullscreen } = useEpisodeFullscreen({ manageBodyLock: true, resetOnMount: true })
-
-  const isCurrentEpisodePlaying = currentEpisode?.id === episode.id && isPlaying
-
-  const handlePlayPause = () => {
-    if (isCurrentEpisodePlaying) {
-      pause()
-    }
-    else if (currentEpisode?.id === episode.id) {
-      play()
-    }
-    else {
-      setCurrentEpisode(episode)
-    }
-  }
 
   const articlePath = `/episode/${episode.id}`
   const backLinkTitle = '返回节目列表'
@@ -200,7 +161,7 @@ function EpisodeDetailContent({ episode, markdownComponents }: EpisodeDetailCont
         <header className={detailHeaderClass}>
           <button
             type="button"
-            onClick={handlePlayPause}
+            onClick={togglePlayback}
             className={cn(
               `
                 group mt-2 flex size-14 shrink-0 items-center justify-center
@@ -221,9 +182,9 @@ function EpisodeDetailContent({ episode, markdownComponents }: EpisodeDetailCont
                 md:size-18
               `,
             )}
-            aria-label={isCurrentEpisodePlaying ? '暂停播放' : '播放节目'}
+            aria-label={isPlaying ? '暂停播放' : '播放节目'}
           >
-            {isCurrentEpisodePlaying
+            {isPlaying
               ? (
                   <RiPauseFill className={`
                     size-6 fill-white text-white

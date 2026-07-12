@@ -2,7 +2,7 @@
 
 import { useSelector } from '@tanstack/react-store'
 import { useEffect } from 'react'
-import { getUIStore, setEpisodeFullscreen, toggleEpisodeFullscreen } from '@/stores/ui-store'
+import { setEpisodeFullscreen, toggleEpisodeFullscreen, uiStore } from '@/stores/ui-store'
 
 interface UseEpisodeFullscreenOptions {
   manageBodyLock?: boolean
@@ -10,7 +10,6 @@ interface UseEpisodeFullscreenOptions {
 }
 
 export function useEpisodeFullscreen({ manageBodyLock = false, resetOnMount = false }: UseEpisodeFullscreenOptions = {}) {
-  const uiStore = getUIStore()
   const isFullscreen = useSelector(uiStore, state => state.isEpisodeFullscreen)
 
   useEffect(() => {

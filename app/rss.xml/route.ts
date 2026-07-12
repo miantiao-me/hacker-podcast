@@ -2,10 +2,11 @@ import { env } from 'cloudflare:workers'
 import markdownit from 'markdown-it'
 import { NextResponse } from 'next/server'
 import { Podcast } from 'podcast'
-import { podcast } from '@/config'
+import { podcast, rssEpisodeCount } from '@/config'
+import { getArticlesByDates } from '@/lib/articles'
+import { getPastDays } from '@/lib/date'
 import { buildAudioUrl } from '@/lib/episodes'
 import { getBaseUrl } from '@/lib/seo'
-import { getPastDays } from '@/lib/utils'
 
 const md = markdownit()
 
@@ -37,14 +38,8 @@ export async function GET() {
     webMaster: 'hacker-podcast@agi.li',
   })
 
-  const runEnv = env.NODE_ENV || 'production'
-  const pastDays = getPastDays(10)
-  const posts = (await Promise.all(
-    pastDays.map(async (day) => {
-      const post = await env.HACKER_PODCAST_KV.get(`content:${runEnv}:hacker-podcast:${day}`, 'json')
-      return post as unknown as Article
-    }),
-  )).filter(Boolean)
+  const pastDays = getPastDays(rssEpisodeCount)
+  const posts = await getArticlesByDates(pastDays)
 
   const audioSizes = await Promise.all(
     posts.map(async (post) => {

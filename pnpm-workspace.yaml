@@ -1,6 +1,5 @@
 allowBuilds:
   esbuild: true
-  puppeteer: true
   sharp: true
   simple-git-hooks: true
   workerd: true
@@ -8,7 +7,6 @@ minimumReleaseAgeExclude:
   - '@vinext/cloudflare@0.1.1'
 onlyBuiltDependencies:
   - esbuild
-  - puppeteer
   - rclone.js
   - sharp
   - simple-git-hooks

@@ -2,15 +2,14 @@
 
 import type { RemixiconComponentType } from '@remixicon/react'
 import type { ComponentType, ReactNode, SVGProps } from 'react'
-import type { PodcastInfo as PodcastInfoData } from '@/types/podcast'
 import { RiAppleFill, RiRssLine, RiYoutubeFill } from '@remixicon/react'
 import { Image } from '@unpic/react'
 import Link from 'next/link'
-import { useId, useMemo, useState } from 'react'
+import { useId, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { markdownExternalLinkComponents } from '@/components/common/markdown-external-link'
 import { Waveform } from '@/components/common/waveform'
-import { TinyWaveFormIcon } from '@/components/common/waveform-icon'
 import { SpotifyIcon } from '@/components/icons/spotify'
 import { XYZIcon } from '@/components/icons/xyz'
 import { podcast, site } from '@/config'
@@ -53,46 +52,23 @@ const coverImageOperations = {
   },
 } as const
 
-interface PodcastInfoProps {
-  podcastInfo: PodcastInfoData
-}
-
-export function PodcastInfo({ podcastInfo }: PodcastInfoProps) {
+export function PodcastInfo() {
   const [isExpanded, setIsExpanded] = useState(false)
   const titleId = useId()
   const aboutSectionId = useId()
   const listenSectionId = useId()
-  const descriptionId = useId()
   const descriptionContentId = useId()
-  const { title, description, cover } = podcastInfo
+  const { title, description, cover } = podcast.base
   const coverAlt = `${title} 封面`
   const coverSrc = new URL(cover, podcast.base.link).toString()
   const homeLinkTitle = `返回首页：${title}`
-  const externalLinkTitle = '在新标签页打开外部链接'
   const shouldTruncate = description.length > site.defaultDescriptionLength
-  let displayDescription = description
-  if (shouldTruncate && !isExpanded) {
-    displayDescription = `${description.slice(0, site.defaultDescriptionLength)}…`
-  }
-  const markdownComponents = useMemo(() => ({
+  const markdownComponents = {
+    ...markdownExternalLinkComponents,
     p: ({ children }: { children?: ReactNode }) => (
-      <p className="leading-relaxed">{children}</p>
+      <p className="leading-relaxed text-pretty">{children}</p>
     ),
-    a: ({ href, children }: { href?: string, children?: ReactNode }) => (
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`
-          font-medium text-theme-text underline transition-colors
-          hover:text-theme-text-hover
-        `}
-        title={externalLinkTitle}
-      >
-        {children}
-      </a>
-    ),
-  }), [externalLinkTitle])
+  }
 
   return (
     <article
@@ -151,99 +127,68 @@ export function PodcastInfo({ podcastInfo }: PodcastInfoProps) {
         <figcaption className="sr-only">{title}</figcaption>
       </figure>
 
-      <div className={`
-        flex flex-col items-center gap-4
-        md:items-start
-      `}
+      <p
+        id={titleId}
+        className={`
+          text-center text-2xl font-bold text-pretty wrap-break-word
+          md:text-left md:text-xl
+        `}
+        itemProp="name"
       >
-        <h2
-          id={titleId}
-          className={`
-            text-center text-2xl font-bold text-pretty wrap-break-word
-            md:text-left md:text-xl
-          `}
-          itemProp="name"
-        >
-          {title}
-        </h2>
-      </div>
+        {title}
+      </p>
 
       <div className="flex flex-col gap-10">
         <section className="flex flex-col gap-5" aria-labelledby={aboutSectionId}>
-          <div
+          <p
             className={`
-              flex items-center justify-center gap-2 font-mono text-xs
-              tracking-wide text-muted-foreground uppercase
-              md:justify-start md:text-sm md:font-medium md:normal-case
+              text-center font-mono text-xs text-muted-foreground
+              md:text-left md:text-sm md:font-medium md:normal-case
             `}
             id={aboutSectionId}
           >
-            <TinyWaveFormIcon
-              colors={['fill-violet-300', 'fill-pink-300']}
-              className="size-2.5"
-              aria-hidden="true"
-            />
-            <span>关于</span>
-          </div>
+            关于
+          </p>
 
-          <div className="flex flex-col gap-2" id={descriptionId} itemProp="description">
-            <div className={`
-              line-clamp-6
-              md:hidden
-            `}
+          <div className="flex flex-col gap-2" itemProp="description">
+            <div
+              id={descriptionContentId}
+              className={cn(shouldTruncate && !isExpanded && 'line-clamp-6')}
             >
               <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                 {description}
               </ReactMarkdown>
             </div>
-
-            <div className={`
-              hidden
-              md:flex md:flex-col md:gap-2
-            `}
-            >
-              <div id={descriptionContentId}>
-                <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-                  {displayDescription}
-                </ReactMarkdown>
-              </div>
-              {shouldTruncate && (
-                <button
-                  type="button"
-                  onClick={() => setIsExpanded(!isExpanded)}
-                  className={`
-                    cursor-pointer self-start font-medium text-theme-text
-                    transition-colors
-                    hover:text-theme-text-hover
-                  `}
-                  aria-expanded={isExpanded}
-                  aria-controls={descriptionContentId}
-                >
-                  {isExpanded ? '收起' : '展开更多'}
-                </button>
-              )}
-            </div>
+            {shouldTruncate && (
+              <button
+                type="button"
+                onClick={() => setIsExpanded(current => !current)}
+                className={`
+                  cursor-pointer self-start font-medium text-theme-text
+                  transition-colors
+                  hover:text-theme-text-hover
+                `}
+                aria-expanded={isExpanded}
+                aria-controls={descriptionContentId}
+              >
+                {isExpanded ? '收起' : '展开更多'}
+              </button>
+            )}
           </div>
         </section>
 
         {podcast.platforms?.length
           ? (
               <section className="flex flex-col gap-5" aria-labelledby={listenSectionId}>
-                <div
+                <p
                   className={`
-                    flex items-center justify-center gap-2 font-mono text-xs
-                    tracking-wide text-muted-foreground uppercase
-                    md:justify-start md:text-sm md:font-medium md:normal-case
+                    text-center font-mono text-xs text-muted-foreground
+                    md:text-left md:text-sm md:font-medium md:normal-case
                   `}
                   id={listenSectionId}
                 >
-                  <TinyWaveFormIcon
-                    colors={['fill-indigo-300', 'fill-blue-300']}
-                    className="size-2.5"
-                    aria-hidden="true"
-                  />
-                  <span>播放</span>
-                </div>
+                  收听平台
+                </p>
 
                 <ul className={`
                   flex items-center justify-center gap-6
@@ -255,7 +200,9 @@ export function PodcastInfo({ podcastInfo }: PodcastInfoProps) {
                     if (!config)
                       return null
                     const Icon = config.icon
-                    const platformLinkTitle = `在 ${platform.name} 中打开播客`
+                    const platformLinkLabel = platform.id === 'rss'
+                      ? '订阅 RSS'
+                      : `前往 ${platform.name}`
                     return (
                       <li key={platform.id} className="list-none">
                         <a
@@ -267,8 +214,7 @@ export function PodcastInfo({ podcastInfo }: PodcastInfoProps) {
                             transition-colors
                             hover:text-theme-text-hover
                           `}
-                          aria-label={platformLinkTitle}
-                          title={platformLinkTitle}
+                          aria-label={platformLinkLabel}
                           itemProp="sameAs"
                         >
                           <Icon
@@ -283,7 +229,7 @@ export function PodcastInfo({ podcastInfo }: PodcastInfoProps) {
                             md:inline
                           `}
                           >
-                            {platform.name}
+                            {platformLinkLabel}
                           </span>
                         </a>
                       </li>
@@ -295,21 +241,6 @@ export function PodcastInfo({ podcastInfo }: PodcastInfoProps) {
           : null}
       </div>
 
-      <div
-        className={`
-          relative w-full py-4
-          md:hidden
-        `}
-        aria-hidden="true"
-      >
-        <div className="absolute inset-0 flex items-center">
-          <div className={`
-            h-px w-full bg-linear-to-r from-transparent via-border
-            to-transparent
-          `}
-          />
-        </div>
-      </div>
     </article>
   )
 }

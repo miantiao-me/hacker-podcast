@@ -4,15 +4,15 @@ export type Theme = 'light' | 'dark' | 'system'
 
 export interface ThemeStoreState {
   theme: Theme
-  storageKey: string
 }
 
 let themeStore: Store<ThemeStoreState> | null = null
+const storageKey = 'next-ui-theme'
 
-function createThemeStore(defaultTheme: Theme, storageKey: string) {
+function createThemeStore() {
   const getInitialTheme = (): Theme => {
     if (typeof window === 'undefined') {
-      return defaultTheme
+      return 'system'
     }
     try {
       const stored = localStorage.getItem(storageKey) as Theme | null
@@ -23,23 +23,23 @@ function createThemeStore(defaultTheme: Theme, storageKey: string) {
     catch (error) {
       console.error('Failed to read stored theme', error)
     }
-    return defaultTheme
+    return 'system'
   }
 
   return new Store<ThemeStoreState>({
     theme: getInitialTheme(),
-    storageKey,
   })
 }
 
-export function initThemeStore(
-  defaultTheme: Theme = 'system',
-  storageKey = 'next-ui-theme',
-): Store<ThemeStoreState> {
+export function initThemeStore(): Store<ThemeStoreState> {
   if (!themeStore) {
-    themeStore = createThemeStore(defaultTheme, storageKey)
+    themeStore = createThemeStore()
   }
   return themeStore
+}
+
+export function persistTheme(theme: Theme): void {
+  localStorage.setItem(storageKey, theme)
 }
 
 export function getThemeStore(): Store<ThemeStoreState> {

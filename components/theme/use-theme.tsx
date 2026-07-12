@@ -2,7 +2,7 @@
 
 import type { Theme } from '@/stores/theme-store'
 import { useSelector } from '@tanstack/react-store'
-import { getThemeStore } from '@/stores/theme-store'
+import { getThemeStore, persistTheme } from '@/stores/theme-store'
 
 export function useTheme() {
   const themeStore = getThemeStore()
@@ -10,7 +10,7 @@ export function useTheme() {
 
   const setTheme = (newTheme: Theme) => {
     try {
-      localStorage.setItem(themeStore.state.storageKey, newTheme)
+      persistTheme(newTheme)
     }
     catch (error) {
       console.error('Failed to persist theme', error)

@@ -1,44 +1,34 @@
-'use client'
-
-import type { PodcastInfo as PodcastInfoData } from '@/types/podcast'
 import { PodcastAside } from '@/components/podcast/aside'
 import { PodcastInfo } from '@/components/podcast/info'
 
 interface PodcastLayoutProps {
   children: React.ReactNode
-  podcastInfo: PodcastInfoData
 }
 
-export function PodcastLayout({ children, podcastInfo }: PodcastLayoutProps) {
+export function PodcastLayout({ children }: PodcastLayoutProps) {
   return (
     <div className={`
-      flex min-h-screen flex-col
+      flex min-h-dvh flex-col
       md:fixed md:inset-0 md:flex-row md:overflow-hidden md:bg-background
     `}
     >
-      <aside className={`
-        hidden h-full w-16 shrink-0 flex-col overflow-y-auto
-        overscroll-y-contain border-r border-border
-        md:flex
-      `}
-      >
-        <PodcastAside />
-      </aside>
+      <PodcastAside />
 
-      <section className={`
+      <div className={`
         flex flex-col border-b border-border
         md:h-full md:w-80 md:shrink-0 md:overflow-y-auto md:overscroll-y-contain
         md:border-r md:border-b-0
         lg:w-96
       `}
       >
-        <PodcastInfo podcastInfo={podcastInfo} />
-      </section>
+        <PodcastInfo />
+      </div>
 
       <main
         id="main-scroll-container"
+        tabIndex={-1}
         className={`
-          flex flex-1 flex-col pb-28
+          flex flex-1 flex-col pb-[calc(7rem+env(safe-area-inset-bottom))]
           md:overflow-y-auto md:overscroll-y-contain
         `}
       >

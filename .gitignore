@@ -39,6 +39,8 @@ next-env.d.ts
 # OpenNext (legacy)
 /.open-next
 
+.vinext
+
 # wrangler
 .wrangler
 

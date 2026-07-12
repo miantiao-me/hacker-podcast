@@ -2,37 +2,20 @@
 
 import type { Episode } from '@/types/podcast'
 import { RiPauseFill, RiPlayFill } from '@remixicon/react'
-import { useSelector } from '@tanstack/react-store'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { MarkdownExternalLink } from '@/components/common/markdown-external-link'
+import { useEpisodePlayback } from '@/hooks/use-episode-playback'
 import { formatZhCnUtcDate, toIsoDateString } from '@/lib/date'
 import { cn } from '@/lib/utils'
-import { getPlayerStore, pause, play, setCurrentEpisode } from '@/stores/player-store'
 
 interface EpisodeItemProps {
   episode: Episode
 }
 
 export function EpisodeItem({ episode }: EpisodeItemProps) {
-  const playerStore = getPlayerStore()
-  const currentEpisode = useSelector(playerStore, state => state.currentEpisode)
-  const isPlaying = useSelector(playerStore, state => state.isPlaying)
-
-  const isCurrentEpisode = currentEpisode?.id === episode.id
-  const isCurrentlyPlaying = isCurrentEpisode && isPlaying
-
-  const handlePlayPause = () => {
-    if (isCurrentlyPlaying) {
-      pause()
-    }
-    else if (isCurrentEpisode) {
-      play()
-    }
-    else {
-      setCurrentEpisode(episode)
-    }
-  }
+  const { isPlaying, togglePlayback } = useEpisodePlayback(episode)
 
   const dateFormatter = formatZhCnUtcDate(episode.published)
   const isoPublishedDate = toIsoDateString(episode.published)
@@ -40,8 +23,6 @@ export function EpisodeItem({ episode }: EpisodeItemProps) {
   const linkHref = `/episode/${episode.id}`
   const episodeLinkTitle = `查看《${episode.title}》详情`
   const showNotesTitle = `打开《${episode.title}》的节目详情页`
-  const externalLinkTitle = '在新标签页打开外部链接'
-
   return (
     <li className="list-none">
       <article
@@ -102,15 +83,12 @@ export function EpisodeItem({ episode }: EpisodeItemProps) {
               remarkPlugins={[remarkGfm]}
               components={{
                 a: ({ href, children }) => (
-                  <a
+                  <MarkdownExternalLink
                     href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="underline"
-                    title={externalLinkTitle}
                   >
                     {children}
-                  </a>
+                  </MarkdownExternalLink>
                 ),
               }}
             >
@@ -132,16 +110,16 @@ export function EpisodeItem({ episode }: EpisodeItemProps) {
         >
           <button
             type="button"
-            onClick={handlePlayPause}
+            onClick={togglePlayback}
             className={`
               flex cursor-pointer items-center gap-1.5 font-medium
               text-theme-text transition-colors
               hover:text-theme-text-hover
               md:gap-2
             `}
-            aria-label={isCurrentlyPlaying ? '暂停播放' : '播放节目'}
+            aria-label={isPlaying ? '暂停播放' : '播放节目'}
           >
-            {isCurrentlyPlaying
+            {isPlaying
               ? (
                   <RiPauseFill className={`
                     size-3.5
@@ -156,7 +134,7 @@ export function EpisodeItem({ episode }: EpisodeItemProps) {
                   `}
                   />
                 )}
-            <span>{isCurrentlyPlaying ? '暂停' : '播放'}</span>
+            <span>{isPlaying ? '暂停' : '播放'}</span>
           </button>
           <span className="text-muted-foreground">/</span>
           <Link

@@ -16,7 +16,16 @@ export interface Env extends CloudflareEnv {
   HACKER_PODCAST_WORKER_URL: string
   HACKER_PODCAST_R2_BUCKET_URL: string
   HACKER_PODCAST_WORKFLOW: Workflow
-  BROWSER: Fetcher
+  BROWSER?: Fetcher
+  TTS_PROVIDER?: string
+  TTS_API_URL?: string
+  TTS_API_ID?: string
+  TTS_API_KEY?: string
+  TTS_MODEL?: string
+  TTS_REGION?: string
+  MAN_VOICE_ID?: string
+  WOMAN_VOICE_ID?: string
+  AUDIO_SPEED?: string
 }
 
 export interface WorkflowContext {
@@ -33,11 +42,6 @@ export interface GeneratedContents {
   podcastContent: string
   blogContent: string
   introContent: string
-}
-
-export interface AudioResult {
-  audioSize?: number
-  conversations: string[]
 }
 
 function parseMaxTokens(value?: string): number {

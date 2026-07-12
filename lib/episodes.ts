@@ -1,3 +1,4 @@
+import type { Article } from '@/schemas/article'
 import type { Episode } from '@/types/podcast'
 
 function appendUpdatedAt(url: string, updatedAt?: number): string {

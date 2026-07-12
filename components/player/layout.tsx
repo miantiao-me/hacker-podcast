@@ -10,10 +10,9 @@ import { CurrentTime, Duration } from '@/components/player/time-info'
 import { TimeSliders } from '@/components/player/time-sliders'
 import { Mute, Volume } from '@/components/player/volume'
 import { cn } from '@/lib/utils'
-import { getPlayerStore } from '@/stores/player-store'
+import { playerStore } from '@/stores/player-store'
 
 export function PlayerLayout() {
-  const playerStore = getPlayerStore()
   const currentEpisode = useSelector(playerStore, state => state.currentEpisode)
 
   return (

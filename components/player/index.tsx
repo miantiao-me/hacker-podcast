@@ -11,11 +11,10 @@ import { useEffect } from 'react'
 import { PlayerLayout } from '@/components/player/layout'
 import { useEpisodeFullscreen } from '@/hooks/use-episode-fullscreen'
 import { cn } from '@/lib/utils'
-import { getPlayerStore, pause, play, setIsPlaying, setIsSourceChanging } from '@/stores/player-store'
+import { pause, play, playerStore, setIsPlaying, setIsSourceChanging } from '@/stores/player-store'
 
 function PlayerContent() {
   const player = useMediaPlayer()
-  const playerStore = getPlayerStore()
   const currentEpisode = useSelector(playerStore, state => state.currentEpisode)
   const isPlaying = useSelector(playerStore, state => state.isPlaying)
 
@@ -51,7 +50,7 @@ function PlayerContent() {
       player.removeEventListener('pause', handlePause)
       player.removeEventListener('ended', handleEnded)
     }
-  }, [player, playerStore])
+  }, [player])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -84,7 +83,6 @@ function PlayerContent() {
 }
 
 export function Player() {
-  const playerStore = getPlayerStore()
   const currentEpisode = useSelector(playerStore, state => state.currentEpisode)
   const isPlaying = useSelector(playerStore, state => state.isPlaying)
   const { isFullscreen: isEpisodeFullscreen } = useEpisodeFullscreen()

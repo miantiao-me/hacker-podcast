@@ -1,6 +1,6 @@
 import { keepDays } from '@/config'
+import { getPastDays } from '@/lib/date'
 import { getBaseUrl } from '@/lib/seo'
-import { getPastDays } from '@/lib/utils'
 
 export const revalidate = 86400
 

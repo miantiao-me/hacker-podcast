@@ -6,6 +6,7 @@ const defaultDescription
 const defaultBaseUrl = import.meta.env?.NEXT_PUBLIC_BASE_URL ?? 'https://hacker-podcast.agi.li'
 
 export const keepDays = 30
+export const rssEpisodeCount = 10
 
 export const podcast: Podcast = {
   base: {
@@ -70,8 +71,6 @@ export const site: Site = {
 
 export const externalLinks = {
   github: 'https://github.com/miantiao-me/hacker-podcast',
-  rss: '/rss.xml',
 }
 
 export const podcastTitle = podcast.base.title
-export const podcastDescription = podcast.base.description

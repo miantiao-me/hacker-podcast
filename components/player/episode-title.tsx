@@ -2,10 +2,9 @@
 
 import { useSelector } from '@tanstack/react-store'
 import { ScrollTextContainer, ScrollTextRow } from '@/components/player/scroll-text'
-import { getPlayerStore } from '@/stores/player-store'
+import { playerStore } from '@/stores/player-store'
 
 export function EpisodeTitle() {
-  const playerStore = getPlayerStore()
   const currentEpisode = useSelector(playerStore, state => state.currentEpisode)
   const isPlaying = useSelector(playerStore, state => state.isPlaying)
 

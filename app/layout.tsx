@@ -81,7 +81,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="zh"
+      lang="zh-CN"
       className={themeClassNames[site.themeColor]}
       suppressHydrationWarning
     >

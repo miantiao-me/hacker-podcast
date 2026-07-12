@@ -1,22 +1,16 @@
 'use client'
 
-import type { Theme } from '@/stores/theme-store'
+import type { ReactNode } from 'react'
 import { useSelector } from '@tanstack/react-store'
 import { useEffect } from 'react'
 import { initThemeStore } from '@/stores/theme-store'
 
 interface ThemeProviderProps {
-  children: React.ReactNode
-  defaultTheme?: Theme
-  storageKey?: string
+  children: ReactNode
 }
 
-export function ThemeProvider({
-  children,
-  defaultTheme = 'system',
-  storageKey = 'next-ui-theme',
-}: ThemeProviderProps) {
-  const themeStore = initThemeStore(defaultTheme, storageKey)
+export function ThemeProvider({ children }: ThemeProviderProps) {
+  const themeStore = initThemeStore()
   const theme = useSelector(themeStore, state => state.theme)
 
   useEffect(() => {

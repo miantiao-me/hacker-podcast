@@ -46,13 +46,6 @@ export interface Podcast {
   platforms: PodcastPlatform[]
 }
 
-export interface PodcastInfo {
-  title: string
-  description: string
-  link: string
-  cover: string
-}
-
 export interface EpisodeAudio {
   src: string
   type: string

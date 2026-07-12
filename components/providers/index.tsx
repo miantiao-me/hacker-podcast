@@ -4,10 +4,7 @@ import type { ReactNode } from 'react'
 import { useSelector } from '@tanstack/react-store'
 import { lazy, Suspense, useSyncExternalStore } from 'react'
 import { ThemeProvider } from '@/components/theme/provider'
-import { initPageStore } from '@/stores/page-store'
-import { getPlayerStore, initPlayerStore } from '@/stores/player-store'
-import { initThemeStore } from '@/stores/theme-store'
-import { initUIStore } from '@/stores/ui-store'
+import { playerStore } from '@/stores/player-store'
 
 const Player = lazy(() => import('@/components/player/index').then(module => ({ default: module.Player })))
 
@@ -23,18 +20,12 @@ function getServerSnapshot() {
   return false
 }
 
-initThemeStore()
-initPlayerStore()
-initPageStore()
-initUIStore()
-
 interface ProvidersProps {
   children: ReactNode
 }
 
 function LazyPlayer() {
   const isHydrated = useSyncExternalStore(subscribeToHydration, getClientSnapshot, getServerSnapshot)
-  const playerStore = getPlayerStore()
   const currentEpisode = useSelector(playerStore, state => state.currentEpisode)
 
   if (!isHydrated || !currentEpisode) {
@@ -46,7 +37,7 @@ function LazyPlayer() {
 
 export function Providers({ children }: ProvidersProps) {
   return (
-    <ThemeProvider storageKey="next-ui-theme">
+    <ThemeProvider>
       {children}
       <Suspense fallback={null}>
         <LazyPlayer />

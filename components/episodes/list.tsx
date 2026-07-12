@@ -1,14 +1,11 @@
 'use client'
 
 import type { Episode } from '@/types/podcast'
-import { useSelector } from '@tanstack/react-store'
 import { useEffect, useId } from 'react'
 import { Waveform } from '@/components/common/waveform'
 import { EpisodeItem } from '@/components/episodes/episode-item'
-import { EpisodeListSkeleton } from '@/components/episodes/list-skeleton'
 import { EpisodePagination } from '@/components/episodes/pagination'
 import { site } from '@/config'
-import { completePageNavigation, getPageStore } from '@/stores/page-store'
 import { setDefaultEpisode } from '@/stores/player-store'
 
 interface EpisodeListProps {
@@ -18,14 +15,6 @@ interface EpisodeListProps {
 }
 
 export function EpisodeList({ episodes, currentPage, totalEpisodes }: EpisodeListProps) {
-  const pageStore = getPageStore()
-  const isNavigating = useSelector(pageStore, state => state.isNavigating)
-  const pendingPage = useSelector(pageStore, state => state.pendingPage)
-
-  useEffect(() => {
-    completePageNavigation(currentPage)
-  }, [currentPage])
-
   useEffect(() => {
     if (!episodes[0])
       return
@@ -38,7 +27,6 @@ export function EpisodeList({ episodes, currentPage, totalEpisodes }: EpisodeLis
   const pageSize = site.pageSize
   const totalPages = Math.max(1, Math.ceil(totalEpisodes / pageSize))
   const hasEpisodes = episodes.length > 0
-  const showSkeleton = isNavigating && pendingPage !== null && pendingPage !== currentPage
 
   return (
     <section className="flex w-full flex-col" aria-labelledby={headingId}>
@@ -56,7 +44,7 @@ export function EpisodeList({ episodes, currentPage, totalEpisodes }: EpisodeLis
             `}
             aria-hidden="true"
           />
-          <h2
+          <h1
             id={headingId}
             className={`
               px-4 py-6 text-xl font-bold text-pretty
@@ -65,7 +53,7 @@ export function EpisodeList({ episodes, currentPage, totalEpisodes }: EpisodeLis
             `}
           >
             节目列表
-          </h2>
+          </h1>
         </div>
       </header>
 
@@ -75,7 +63,7 @@ export function EpisodeList({ episodes, currentPage, totalEpisodes }: EpisodeLis
         lg:px-20
       `}
       >
-        <h3
+        <h2
           id={listHeadingId}
           className={`
             text-lg font-semibold text-pretty text-foreground
@@ -83,39 +71,32 @@ export function EpisodeList({ episodes, currentPage, totalEpisodes }: EpisodeLis
           `}
         >
           最近更新
-        </h3>
+        </h2>
       </div>
 
-      {showSkeleton
+      {!hasEpisodes
         ? (
+            <p
+              className={`
+                px-4 py-8 text-center text-muted-foreground
+                md:px-10 md:py-20
+                lg:px-20
+              `}
+              role="status"
+            >
+              暂无节目
+            </p>
+          )
+        : (
             <>
-              <EpisodeListSkeleton />
+              <ul className="flex flex-col" aria-labelledby={listHeadingId}>
+                {episodes.map(episode => (
+                  <EpisodeItem key={episode.id} episode={episode} />
+                ))}
+              </ul>
               <EpisodePagination currentPage={currentPage} totalPages={totalPages} />
             </>
-          )
-        : !hasEpisodes
-            ? (
-                <p
-                  className={`
-                    px-4 py-8 text-center text-muted-foreground
-                    md:px-10 md:py-20
-                    lg:px-20
-                  `}
-                  role="status"
-                >
-                  暂无节目
-                </p>
-              )
-            : (
-                <>
-                  <ul className="flex flex-col" aria-labelledby={listHeadingId}>
-                    {episodes.map(episode => (
-                      <EpisodeItem key={episode.id} episode={episode} />
-                    ))}
-                  </ul>
-                  <EpisodePagination currentPage={currentPage} totalPages={totalPages} />
-                </>
-              )}
+          )}
     </section>
   )
 }

@@ -7,17 +7,29 @@ import { externalLinks, podcast } from '@/config'
 
 export function PodcastAside() {
   return (
-    <aside className={`
-      flex h-full flex-col items-center justify-between px-4 py-8
-    `}
+    <aside
+      aria-label="播客工具"
+      className={`
+        flex shrink-0 items-center justify-between border-b border-border
+        pt-[calc(0.75rem+env(safe-area-inset-top))]
+        pr-[calc(1rem+env(safe-area-inset-right))] pb-3
+        pl-[calc(1rem+env(safe-area-inset-left))]
+        md:h-full md:w-16 md:flex-col md:overflow-y-auto md:overscroll-y-contain
+        md:border-r md:border-b-0 md:px-4 md:py-8
+      `}
     >
-      <section className={`
-        sticky top-0 flex items-center gap-6 py-4 whitespace-nowrap
-        [writing-mode:vertical-rl]
+      <div className={`
+        hidden items-center gap-3 whitespace-nowrap
+        sm:flex
+        md:gap-6 md:py-4 md:[writing-mode:vertical-rl]
       `}
       >
-        <span className="font-mono text-muted-foreground">主 播</span>
-        <span className="flex gap-6 font-bold">
+        <span className="font-mono text-muted-foreground">主播</span>
+        <span className={`
+          flex gap-3 font-bold
+          md:gap-6
+        `}
+        >
           {podcast.hosts.map((host, index) => (
             <Fragment key={host.name}>
               {index !== 0 && (
@@ -32,32 +44,37 @@ export function PodcastAside() {
                 className={`
                   cursor-pointer transition-colors
                   hover:text-theme-text
+                  focus-visible:rounded-sm focus-visible:ring-2
+                  focus-visible:ring-ring focus-visible:outline-none
                 `}
-                title={`访问 ${host.name} 的主页`}
-                aria-label={`访问 ${host.name} 的主页`}
               >
                 {host.name}
               </a>
             </Fragment>
           ))}
         </span>
-      </section>
-      <section className="flex flex-col items-center gap-5">
+      </div>
+      <div className={`
+        ml-auto flex items-center gap-5
+        md:ml-0 md:flex-col
+      `}
+      >
         <a
           href={externalLinks.github}
           target="_blank"
           rel="noopener noreferrer"
           className={`
-            cursor-pointer transition-colors
+            cursor-pointer rounded-sm transition-colors
             hover:text-theme-text
+            focus-visible:ring-2 focus-visible:ring-ring
+            focus-visible:outline-none
           `}
-          title="打开 GitHub 仓库"
           aria-label="打开 GitHub 仓库"
         >
-          <RiGithubFill className="size-6" />
+          <RiGithubFill className="size-6" aria-hidden="true" />
         </a>
         <ThemeToggle />
-      </section>
+      </div>
     </aside>
   )
 }
