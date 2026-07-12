@@ -63,7 +63,6 @@ HACKER_PODCAST_R2_BUCKET_URL=https://your-bucket-url
 OPENAI_API_KEY=your_api_key
 OPENAI_BASE_URL=https://api.openai.com/v1
 OPENAI_MODEL=gpt-4.1
-
 ```
 
 3. 启动开发服务器:

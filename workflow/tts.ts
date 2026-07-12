@@ -9,6 +9,7 @@ import {
   createUnSpeech,
   createUnVolcengine,
 } from 'unspeech'
+import { z } from 'zod'
 
 interface Env extends CloudflareEnv {
   TTS_PROVIDER?: string
@@ -23,6 +24,24 @@ interface Env extends CloudflareEnv {
 }
 
 const defaultMicrosoftRegion = 'eastus'
+const defaultArkURL = 'https://openspeech.bytedance.com/api/v3/plan/tts/unidirectional'
+const defaultMiMoURL = 'https://api.xiaomimimo.com/v1/chat/completions'
+
+const arkResponseSchema = z.looseObject({
+  code: z.number(),
+  message: z.string().optional(),
+  data: z.string().nullable().optional(),
+})
+
+const mimoResponseSchema = z.looseObject({
+  choices: z.array(z.looseObject({
+    message: z.looseObject({
+      audio: z.looseObject({
+        data: z.base64().min(1),
+      }),
+    }),
+  })).min(1),
+})
 
 type SpeechModel<TProvider extends { speech: (...args: never[]) => unknown }> = Parameters<TProvider['speech']>[0]
 type UnAlibabaCloudModel = SpeechModel<ReturnType<typeof createUnAlibabaCloud>>
@@ -173,6 +192,171 @@ async function murfTTS(text: string, gender: string, env: Env) {
   return new Blob([body], { type: 'audio/mpeg' })
 }
 
+function parseArkSpeechRate(value: string | undefined) {
+  const ratio = Number(value)
+  if (!Number.isFinite(ratio) || ratio < 0.5 || ratio > 2) {
+    return undefined
+  }
+  return Math.min(100, Math.max(-50, Math.round((ratio - 1) * 100)))
+}
+
+function createArkError(code: number | string, message: string, logid: string | null) {
+  return new Error(`Ark TTS failed: code=${code}, message=${message}, logid=${logid || 'unknown'}`)
+}
+
+async function arkTTS(text: string, gender: string, env: Env) {
+  const apiKey = requireTTSConfig(env.TTS_API_KEY, 'TTS_API_KEY', 'ark')
+  const requestId = crypto.randomUUID()
+  const speechRate = parseArkSpeechRate(env.AUDIO_SPEED)
+  const response = await $fetch.raw<ReadableStream<Uint8Array>, 'stream'>(env.TTS_API_URL || defaultArkURL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Api-Key': apiKey,
+      'X-Api-Request-Id': requestId,
+      'X-Api-Resource-Id': env.TTS_MODEL || 'seed-tts-2.0',
+      'X-Control-Require-Usage-Tokens-Return': '*',
+    },
+    signal: AbortSignal.timeout(30000),
+    responseType: 'stream',
+    ignoreResponseError: true,
+    body: {
+      user: { uid: requestId },
+      req_params: {
+        text,
+        speaker: gender === '男'
+          ? (env.MAN_VOICE_ID || 'zh_female_xiaohe_uranus_bigtts')
+          : (env.WOMAN_VOICE_ID || 'zh_female_qingxinnvsheng_uranus_bigtts'),
+        audio_params: {
+          format: 'mp3',
+          sample_rate: 24000,
+          ...(speechRate === undefined ? {} : { speech_rate: speechRate }),
+        },
+      },
+    },
+  })
+  const logid = response.headers.get('X-Tt-Logid')
+  console.info('Ark TTS X-Tt-Logid', logid)
+
+  if (!response.ok) {
+    throw createArkError(response.status, response.statusText || 'HTTP error', logid)
+  }
+
+  const stream = response._data
+  if (!stream) {
+    throw createArkError('NO_BODY', 'response body is empty', logid)
+  }
+
+  const audioChunks: Buffer[] = []
+  const decoder = new TextDecoder()
+  const reader = stream.getReader()
+  let pending = ''
+  let completed = false
+
+  function parseLine(line: string) {
+    if (!line.trim()) {
+      return
+    }
+
+    let json: unknown
+    try {
+      json = JSON.parse(line)
+    }
+    catch (error) {
+      const message = error instanceof Error ? error.message : 'invalid JSON'
+      throw createArkError('INVALID_JSON', message, logid)
+    }
+
+    const result = arkResponseSchema.safeParse(json)
+    if (!result.success) {
+      throw createArkError('INVALID_FRAME', result.error.message, logid)
+    }
+
+    const frame = result.data
+    if (frame.code === 0) {
+      if (frame.data) {
+        const audio = Buffer.from(frame.data, 'base64')
+        if (audio.byteLength > 0) {
+          audioChunks.push(audio)
+        }
+      }
+      return
+    }
+    if (frame.code === 20000000) {
+      completed = true
+      return
+    }
+    throw createArkError(frame.code, frame.message || 'unknown error', logid)
+  }
+
+  try {
+    while (!completed) {
+      const { done, value } = await reader.read()
+      if (done) {
+        break
+      }
+      pending += decoder.decode(value, { stream: true })
+      const lines = pending.split('\n')
+      pending = lines.pop() || ''
+      for (const line of lines) {
+        parseLine(line)
+        if (completed) {
+          break
+        }
+      }
+    }
+  }
+  finally {
+    await reader.cancel().catch(() => undefined)
+    reader.releaseLock()
+  }
+
+  if (!completed) {
+    pending += decoder.decode()
+    parseLine(pending)
+  }
+
+  if (!completed) {
+    throw createArkError('INCOMPLETE', 'success frame was not received', logid)
+  }
+  if (audioChunks.length === 0) {
+    throw createArkError('EMPTY_AUDIO', 'audio is empty', logid)
+  }
+
+  return createAudioBlob(Buffer.concat(audioChunks))
+}
+
+async function mimoTTS(text: string, gender: string, env: Env) {
+  const apiKey = requireTTSConfig(env.TTS_API_KEY, 'TTS_API_KEY', 'mimo')
+  const response: unknown = await $fetch(env.TTS_API_URL || defaultMiMoURL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'api-key': apiKey,
+    },
+    signal: AbortSignal.timeout(60000),
+    body: {
+      model: env.TTS_MODEL || 'mimo-v2.5-tts',
+      messages: [{ role: 'assistant', content: text }],
+      audio: {
+        format: 'mp3',
+        voice: gender === '男' ? (env.MAN_VOICE_ID || '苏打') : (env.WOMAN_VOICE_ID || '冰糖'),
+      },
+    },
+  })
+  const result = mimoResponseSchema.safeParse(response)
+  if (!result.success) {
+    throw new Error(`MiMo TTS failed: invalid response audio data: ${result.error.message}`)
+  }
+
+  const audio = Buffer.from(result.data.choices[0].message.audio.data, 'base64')
+  if (audio.byteLength === 0) {
+    throw new Error('MiMo TTS failed: audio is empty')
+  }
+
+  return createAudioBlob(audio)
+}
+
 async function unAlibabaCloudTTS(text: string, gender: string, env: Env) {
   const config = resolveUnSpeechConfig(env, gender, 'alibaba')
   const model = normalizeModel(config.model, 'alibaba', 'aliyun') as UnAlibabaCloudModel
@@ -270,8 +454,12 @@ export default function (text: string, gender: string, env: Env) {
   const provider = env.TTS_PROVIDER?.toLowerCase()
   console.info('TTS_PROVIDER', env.TTS_PROVIDER)
   switch (provider) {
+    case 'ark':
+      return arkTTS(text, gender, env)
     case 'minimax':
       return minimaxTTS(text, gender, env)
+    case 'mimo':
+      return mimoTTS(text, gender, env)
     case 'murf':
       return murfTTS(text, gender, env)
     case 'alibaba':
