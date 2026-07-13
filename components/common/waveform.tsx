@@ -23,6 +23,8 @@ function generateStaticHeights() {
   })
 }
 
+const staticHeights = generateStaticHeights()
+
 function generateWaveHeights(time: number) {
   return Array.from({ length: bars.total }, (_, index) => {
     const progress = index / bars.total
@@ -56,20 +58,16 @@ function getPrefersReducedMotionServerSnapshot() {
 export function Waveform(props: React.SVGProps<SVGSVGElement>) {
   const id = useId()
   const isPlaying = useSelector(playerStore, state => state.isPlaying)
-  const [animatedHeights, setAnimatedHeights] = useState<number[]>(() =>
-    generateStaticHeights(),
-  )
+  const [animatedHeights, setAnimatedHeights] = useState<number[]>(staticHeights)
   const prefersReducedMotion = useSyncExternalStore(
     subscribePrefersReducedMotion,
     getPrefersReducedMotionSnapshot,
     getPrefersReducedMotionServerSnapshot,
   )
   const timeRef = useRef(0)
-  const staticHeightsRef = useRef(generateStaticHeights())
 
   useEffect(() => {
     if (!isPlaying) {
-      staticHeightsRef.current = generateStaticHeights()
       timeRef.current = 0
     }
   }, [isPlaying])
@@ -93,7 +91,7 @@ export function Waveform(props: React.SVGProps<SVGSVGElement>) {
     return () => cancelAnimationFrame(animationFrame)
   }, [isPlaying, prefersReducedMotion])
 
-  const barHeights = isPlaying && !prefersReducedMotion ? animatedHeights : staticHeightsRef.current
+  const barHeights = isPlaying && !prefersReducedMotion ? animatedHeights : staticHeights
 
   return (
     <svg {...props} aria-hidden="true">

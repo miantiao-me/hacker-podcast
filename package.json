@@ -19,7 +19,8 @@
     "logs:worker": "wrangler tail --cwd worker",
     "tests": "wrangler dev --cwd tests --remote",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
-    "wrangler": "wrangler"
+    "wrangler": "wrangler",
+    "doctor": "npx react-doctor@latest"
   },
   "devDependencies": {
     "@ai-sdk/openai-compatible": "^2.0.49",
@@ -50,10 +51,8 @@
     "eslint-plugin-better-tailwindcss": "^4.6.0",
     "eslint-plugin-format": "^2.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
-    "fscreen": "^1.2.0",
     "lint-staged": "^17.0.7",
     "markdown-it": "^14.2.0",
-    "media-icons": "^1.1.5",
     "motion": "^12.40.0",
     "ofetch": "^1.5.1",
     "podcast": "^2.0.1",

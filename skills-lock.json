@@ -25,6 +25,12 @@
       "skillPath": ".agents/skills/migrate-to-vinext/SKILL.md",
       "computedHash": "660f2e78a96c76792fd8a74b0ce714c69a67fed95de8698df4b32186b3cec097"
     },
+    "react-doctor": {
+      "source": "millionco/react-doctor",
+      "sourceType": "github",
+      "skillPath": "skills/react-doctor/SKILL.md",
+      "computedHash": "fa180e84006740f0ad139f3d11bc9b1ba43de91b376e73d4e40b5e09e37fa9ed"
+    },
     "seo-aeo-best-practices": {
       "source": "sanity-io/agent-toolkit",
       "sourceType": "github",

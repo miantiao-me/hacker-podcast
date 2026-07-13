@@ -5,11 +5,11 @@ import type { Components } from 'react-markdown'
 import type { Episode } from '@/types/podcast'
 import { RiArrowLeftSLine, RiPauseFill, RiPlayFill } from '@remixicon/react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useId, useMemo } from 'react'
+import { useEffect, useId } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { ImageZoom } from '@/components/common/image-zoom'
-import { markdownExternalLinkComponents } from '@/components/common/markdown-external-link'
+import { markdownExternalLinkComponents } from '@/components/common/markdown-components'
 import { Waveform } from '@/components/common/waveform'
 import { EpisodeFullscreenToggle } from '@/components/episodes/fullscreen-toggle'
 import { useEpisodeFullscreen } from '@/hooks/use-episode-fullscreen'
@@ -31,7 +31,7 @@ interface EpisodeBackButtonProps {
 export function EpisodeDetail({ episode }: EpisodeDetailProps) {
   const content = episode.content ?? episode.description ?? ''
 
-  const images = useMemo(() => extractImagesFromMarkdown(content), [content])
+  const images = extractImagesFromMarkdown(content)
 
   useEffect(() => {
     window.scrollTo({ top: 0 })

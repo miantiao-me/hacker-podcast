@@ -3,6 +3,7 @@ allowBuilds:
   sharp: true
   simple-git-hooks: true
   workerd: true
+minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - '@vinext/cloudflare@0.1.1'
 onlyBuiltDependencies:
@@ -12,3 +13,11 @@ onlyBuiltDependencies:
   - simple-git-hooks
   - unrs-resolver
   - workerd
+packageExtensions:
+  '@vidstack/react@1.15.6':
+    dependencies:
+      fscreen: ^1.2.0
+      media-icons: ^1.1.5
+trustPolicy: no-downgrade
+trustPolicyExclude:
+  - undici-types@6.21.0

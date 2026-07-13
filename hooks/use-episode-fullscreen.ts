@@ -9,6 +9,18 @@ interface UseEpisodeFullscreenOptions {
   resetOnMount?: boolean
 }
 
+function enterFullscreen() {
+  setEpisodeFullscreen(true)
+}
+
+function exitFullscreen() {
+  setEpisodeFullscreen(false)
+}
+
+function toggleFullscreenState() {
+  toggleEpisodeFullscreen()
+}
+
 export function useEpisodeFullscreen({ manageBodyLock = false, resetOnMount = false }: UseEpisodeFullscreenOptions = {}) {
   const isFullscreen = useSelector(uiStore, state => state.isEpisodeFullscreen)
 
@@ -46,10 +58,6 @@ export function useEpisodeFullscreen({ manageBodyLock = false, resetOnMount = fa
       document.removeEventListener('keydown', handleKeyDown)
     }
   }, [isFullscreen, manageBodyLock])
-
-  const enterFullscreen = () => setEpisodeFullscreen(true)
-  const exitFullscreen = () => setEpisodeFullscreen(false)
-  const toggleFullscreenState = () => toggleEpisodeFullscreen()
 
   return {
     isFullscreen,

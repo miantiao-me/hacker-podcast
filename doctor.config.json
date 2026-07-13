@@ -1,0 +1,13 @@
+{
+  "ignore": {
+    "overrides": [
+      {
+        "files": ["workflow/audio.ts"],
+        "rules": ["react-doctor/async-await-in-loop"]
+      },
+      {
+        "files": ["components/ui/**"]
+      }
+    ]
+  }
+}

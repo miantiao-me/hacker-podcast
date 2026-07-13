@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import type { Components } from 'react-markdown'
 
 interface MarkdownExternalLinkProps {
   href?: string
@@ -22,7 +21,3 @@ export function MarkdownExternalLink({ href, children, className }: MarkdownExte
     </a>
   )
 }
-
-export const markdownExternalLinkComponents = {
-  a: MarkdownExternalLink,
-} satisfies Partial<Components>

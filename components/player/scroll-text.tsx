@@ -1,7 +1,8 @@
 'use client'
 
 import type { HTMLAttributes, ReactNode } from 'react'
-import { motion, useAnimationFrame, useMotionValue, useTransform } from 'motion/react'
+import { domAnimation, LazyMotion, useAnimationFrame, useMotionValue, useTransform } from 'motion/react'
+import * as m from 'motion/react-m'
 import { useCallback, useLayoutEffect, useMemo, useRef, useSyncExternalStore } from 'react'
 import { cn } from '@/lib/utils'
 
@@ -137,25 +138,27 @@ export function ScrollTextRow({ children, baseVelocity = 5, direction = 1, isPla
       className={cn(`w-full overflow-hidden whitespace-nowrap`, className)}
       {...props}
     >
-      <motion.div
-        className={`
-          inline-flex transform-gpu items-center will-change-transform
-          select-none
-        `}
-        style={{ x }}
-      >
-        {copyIds.map((id, idx) => (
-          <div
-            key={id}
-            ref={idx === 0 ? blockRef : null}
-            aria-hidden={idx !== 0}
-            className="inline-flex shrink-0 items-center"
-          >
-            {children}
-            {idx < numCopies - 1 && <div className="inline-flex w-8 shrink-0" aria-hidden="true" />}
-          </div>
-        ))}
-      </motion.div>
+      <LazyMotion features={domAnimation}>
+        <m.div
+          className={`
+            inline-flex transform-gpu items-center will-change-transform
+            select-none
+          `}
+          style={{ x }}
+        >
+          {copyIds.map((id, idx) => (
+            <div
+              key={id}
+              ref={idx === 0 ? blockRef : null}
+              aria-hidden={idx !== 0}
+              className="inline-flex shrink-0 items-center"
+            >
+              {children}
+              {idx < numCopies - 1 && <div className="inline-flex w-8 shrink-0" aria-hidden="true" />}
+            </div>
+          ))}
+        </m.div>
+      </LazyMotion>
     </div>
   )
 }

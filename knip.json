@@ -1,0 +1,13 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "app/**/page.tsx",
+    "app/**/layout.tsx",
+    "app/**/route.ts",
+    "app/robots.ts",
+    "app/sitemap.ts",
+    "proxy.ts",
+    "worker/index.ts",
+    "tests/audio.ts"
+  ]
+}

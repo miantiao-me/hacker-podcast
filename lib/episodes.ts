@@ -21,14 +21,13 @@ function buildReferencesSection(stories?: Story[]): string {
   }
 
   const items = stories
-    .map((story) => {
+    .flatMap((story): string[] => {
       const title = story.title || story.url || story.hackerNewsUrl || ''
       const href = story.url || story.hackerNewsUrl || '#'
       if (!title || !href)
-        return null
-      return `- [${title}](${href})`
+        return []
+      return [`- [${title}](${href})`]
     })
-    .filter(Boolean)
 
   if (items.length === 0) {
     return ''

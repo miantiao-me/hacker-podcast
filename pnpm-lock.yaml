@@ -4,6 +4,8 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+packageExtensionsChecksum: sha256-zxUvGj8fAcavAz3vCTX6B5tE++69rlgAzE1pZa+V9OY=
+
 importers:
 
   .:
@@ -92,18 +94,12 @@ importers:
       eslint-plugin-react-refresh:
         specifier: ^0.5.2
         version: 0.5.2(eslint@10.4.1(jiti@2.7.0))
-      fscreen:
-        specifier: ^1.2.0
-        version: 1.2.0
       lint-staged:
         specifier: ^17.0.7
         version: 17.0.7
       markdown-it:
         specifier: ^14.2.0
         version: 14.2.0
-      media-icons:
-        specifier: ^1.1.5
-        version: 1.1.5
       motion:
         specifier: ^12.40.0
         version: 12.40.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -5226,7 +5222,9 @@ snapshots:
     dependencies:
       '@floating-ui/dom': 1.7.6
       '@types/react': 19.2.17
+      fscreen: 1.2.0
       media-captions: 1.0.4
+      media-icons: 1.1.5
       react: 19.2.7
 
   '@vinext/cloudflare@0.1.1(vinext@0.1.1(@vitejs/plugin-react@6.0.1(vite@8.0.16(@types/node@22.19.17)(esbuild@0.27.3)(jiti@2.7.0)(terser@5.46.0)(yaml@2.9.0)))(@vitejs/plugin-rsc@0.5.27(react-dom@19.2.7(react@19.2.7))(react-server-dom-webpack@19.2.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(webpack@5.105.2(esbuild@0.27.3)))(react@19.2.7)(vite@8.0.16(@types/node@22.19.17)(esbuild@0.27.3)(jiti@2.7.0)(terser@5.46.0)(yaml@2.9.0)))(react-dom@19.2.7(react@19.2.7))(react-server-dom-webpack@19.2.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(webpack@5.105.2(esbuild@0.27.3)))(react@19.2.7)(typescript@5.9.3)(vite@8.0.16(@types/node@22.19.17)(esbuild@0.27.3)(jiti@2.7.0)(terser@5.46.0)(yaml@2.9.0)))':

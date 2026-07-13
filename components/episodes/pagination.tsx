@@ -17,6 +17,10 @@ interface EpisodePaginationProps {
   totalPages: number
 }
 
+function getPageHref(page: number) {
+  return page <= 1 ? '/' : `/page/${page}`
+}
+
 export function EpisodePagination({ currentPage, totalPages }: EpisodePaginationProps) {
   const pages = useMemo(() => {
     const result: Array<{ type: 'page', value: number } | { type: 'ellipsis', key: string }> = []
@@ -38,10 +42,6 @@ export function EpisodePagination({ currentPage, totalPages }: EpisodePagination
     }
     return result
   }, [currentPage, totalPages])
-
-  const getPageHref = (page: number) => {
-    return page <= 1 ? '/' : `/page/${page}`
-  }
 
   if (totalPages <= 1) {
     return null
