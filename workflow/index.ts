@@ -20,6 +20,11 @@ const retryConfig: WorkflowStepConfig = {
   timeout: '3 minutes',
 }
 
+const thinkingModelRetryConfig: WorkflowStepConfig = {
+  ...retryConfig,
+  timeout: '10 minutes',
+}
+
 async function getTopStories(today: string, isDev: boolean, step: WorkflowStep, env: Env): Promise<Story[]> {
   return await step.do(stepNames.topStories(today), retryConfig, async () => {
     const topStories = await getHackerNewsTopStories(today, env)
@@ -64,7 +69,7 @@ async function processStories(stories: Story[], step: WorkflowStep, ctx: Workflo
 }
 
 async function generateContents(allStories: string[], stories: Story[], step: WorkflowStep, ctx: WorkflowContext): Promise<GeneratedContents> {
-  const podcastContent = await step.do(stepNames.generatePodcastScript, retryConfig, async () => {
+  const podcastContent = await step.do(stepNames.generatePodcastScript, thinkingModelRetryConfig, async () => {
     const { text, usage, finishReason } = await generateText({
       model: ctx.openai(ctx.env.OPENAI_THINKING_MODEL || ctx.env.OPENAI_MODEL),
       system: summarizePodcastPrompt,
@@ -82,7 +87,7 @@ async function generateContents(allStories: string[], stories: Story[], step: Wo
 
   await step.sleep(stepNames.pauseAfterPodcastScript, ctx.breakTime)
 
-  const blogContent = await step.do(stepNames.generateBlogArticle, retryConfig, async () => {
+  const blogContent = await step.do(stepNames.generateBlogArticle, thinkingModelRetryConfig, async () => {
     const { text, usage, finishReason } = await generateText({
       model: ctx.openai(ctx.env.OPENAI_THINKING_MODEL || ctx.env.OPENAI_MODEL),
       system: summarizeBlogPrompt,
